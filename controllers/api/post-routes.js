@@ -67,13 +67,16 @@ router.post('/', (req, res) => {
 // CREATE PUT ROUTE FOR VOTING ON A POST
 // PUT /API/POSTS/UPVOTE
 router.put('/upvote', (req, res) => {
-    // CUSTOM STATIC METHOD CREATED IN MODELS/POST.JS
-    Post.upvote(req.body, { Vote })
-    .then(updatedPostData => res.json(updatedPostData))
-    .catch(err => {
-        console.log(err);
-        res.status(400).json(err);
-    });
+    // make sure the session exist first
+    if (req.session) {
+        // pass session id along with all destructured properties on req.body
+        Post.upvote({ ...req.body, user_id: req.session.user_id }, { Vote, Comment, User })
+        .then(updatedVoteData => res.json(updatedVoteData))
+        .catch(err => {
+            console.log(err);
+            res.status(500).json(err);
+        });
+    }
 });
 
 // UPDATE A POST'S TITLE
